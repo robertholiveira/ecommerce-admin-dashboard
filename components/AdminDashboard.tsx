@@ -11,6 +11,7 @@ interface Order {
 const AdminDashboard: React.FC = () => {
   const [orderList, setOrderList] = useState<Order[]>([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [newOrder, setNewOrder] = useState<Order>({
     title: '',
     description: '',
@@ -47,10 +48,12 @@ const AdminDashboard: React.FC = () => {
   };
 
   const handleDeleteOrder = (title: string) => {
+    setIsLoading(true);
     fetch(`/api/orders?title=${title}`, {
       method: 'DELETE',
     })
-      .then(() => setOrderList(orderList.filter(order => order.title !== title)));
+      .then(() => setOrderList(orderList.filter(order => order.title !== title)))
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -90,8 +93,9 @@ const AdminDashboard: React.FC = () => {
                   <button
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                     onClick={() => handleDeleteOrder(order.title)}
+                    disabled={isLoading}
                   >
-                    Delete
+                    {isLoading ? 'Deleting...' : 'Delete'}
                   </button>
                 </td>
               </tr>
